@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập - MyWallet</title>
+  
+  <link rel="stylesheet" href="css/style_login.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <a href="index.html" class="back-home-btn"><i class="fa-solid fa-arrow-left"></i> Trang chủ</a>
+
+    <div class="login-container">
+        <form class="login-form">
+            <div class="form-header">
+                <h2>Đăng Nhập</h2>
+                <p>Chào mừng bạn quay trở lại!</p>
+            </div>
+            
+            <div class="input-group">
+                <label>Tên tài khoản</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" placeholder="Nhập tên hiển thị của bạn">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Mật khẩu</label> 
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" placeholder="Nhập mật khẩu"> 
+                </div>
+            </div>
+
+            <button type="button" class="btn-login" onclick="login()">Truy cập Dashboard</button>
+
+            <p class="forgot-pass">Quên mật khẩu? <a href="#">Lấy lại ngay</a></p>
+
+            <div style="margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
+                <span style="color: #666;">Chưa có tài khoản? </span>
+                <a href="register.html" style="color: #4e73df; font-weight: bold; text-decoration: none;">Đăng ký ngay</a>
+            </div>
+
+        </form>
+    </div>
+
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

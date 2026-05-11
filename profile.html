@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài Khoản - MyWallet</title>
+    
+    <link rel="stylesheet" href="css/style_dashboard.css">
+    <link rel="stylesheet" href="css/style_profile.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <h2><i class="fa-solid fa-wallet"></i> MyWallet</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+                <li><a href="input.html"><i class="fa-solid fa-circle-plus"></i> Nhập Thu/Chi</a></li>
+                <li><a href="transactions.html"><i class="fa-solid fa-list-ul"></i> Sổ Giao Dịch</a></li>
+                <li><a href="report.html"><i class="fa-solid fa-chart-pie"></i> Báo Cáo</a></li>
+                <li class="active"><a href="profile.html"><i class="fa-solid fa-user-gear"></i> Tài khoản</a></li>
+                <li><a href="#" onclick="dangXuat()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <h3>Cài Đặt Tài Khoản</h3>
+                <div class="user-info">
+                    <span id="welcome-message">...</span>
+                    <div class="avatar-circle">
+                         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width: 100%; border-radius: 50%;">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="profile-card">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" width="100" style="border-radius: 50%; border: 3px solid #4e73df;">
+                        <h3 style="margin-top: 10px;">Hồ Sơ Của Tôi</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tên đăng nhập (Không thể sửa)</label>
+                        <input type="text" id="username" class="form-control" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Họ và Tên hiển thị</label>
+                        <input type="text" id="fullname" class="form-control" placeholder="Nhập họ tên của bạn">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nghề nghiệp hiện tại</label>
+                        <select id="job" class="form-control">
+                            <option value="">-- Chọn nghề nghiệp --</option>
+                            <option value="Sinh Viên">Sinh Viên</option>
+                            <option value="Nhân viên văn phòng">Nhân viên văn phòng</option>
+                            <option value="Freelancer">Freelancer (Tự do)</option>
+                            <option value="Nội trợ">Nội trợ</option>
+                        </select>
+                        <small style="color: gray; font-size: 13px;">* Hệ thống sẽ gợi ý chi tiêu và đổi avatar dựa trên nghề nghiệp của bạn.</small>
+                    </div>
+
+                    <button class="btn-save" onclick="capNhatHoSo()">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi
+                    </button>
+
+                    <button class="btn-save" style="background: #e74a3b; margin-top: 15px;" onclick="moModalPassword()">
+                        <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="passwordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div class="modal-content" style="background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h3 style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Đổi Mật Khẩu</h3>
+            
+            <div class="form-group">
+                <label>Mật khẩu cũ</label>
+                <input type="password" id="old-pass" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu mới</label>
+                <input type="password" id="new-pass" class="form-control">
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="document.getElementById('passwordModal').style.display='none'" style="padding: 10px 20px; border: none; background: #858796; color: white; border-radius: 5px; cursor: pointer;">Hủy</button>
+                <button onclick="doiMatKhau()" style="padding: 10px 20px; border: none; background: #e74a3b; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="js/profile.js"></script>
+
+</body>
+</html>

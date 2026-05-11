@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MyWallet</title>
+    
+    <link rel="stylesheet" href="css/style_dashboard.css">
+    <link rel="stylesheet" href="css/style_chat.css"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .recent-transactions {
+            display: flex;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            height: 400px;
+            overflow: hidden;
+        }
+        .recent-transactions h4 {
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <h2><i class="fa-solid fa-wallet"></i> MyWallet</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+                <li><a href="input.html"><i class="fa-solid fa-circle-plus"></i> Nhập Thu/Chi</a></li>
+                <li><a href="transactions.html"><i class="fa-solid fa-list-ul"></i> Sổ Giao Dịch</a></li>
+                <li><a href="report.html"><i class="fa-solid fa-chart-pie"></i> Báo Cáo</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user-gear"></i> Tài khoản</a></li>
+                <li><a href="#" onclick="dangXuat()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <h3>Tổng Quan Tài Chính</h3>
+                <div class="user-info">
+                    <span id="welcome-message">Xin chào, <b>...</b></span>
+                    <div class="avatar-circle">
+                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width: 100%; border-radius: 50%;">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="stats-grid">
+                    <div class="card card-green">
+                        <div class="card-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="card-info">
+                            <h3>Tổng Thu</h3>
+                            <p>Đang tải...</p> 
+                        </div>
+                    </div>
+                    <div class="card card-red">
+                        <div class="card-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        <div class="card-info">
+                            <h3>Tổng Chi</h3>
+                            <p>Đang tải...</p>
+                        </div>
+                    </div>
+                    <div class="card card-blue">
+                        <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="card-info">
+                            <h3>Số Dư</h3>
+                            <p>Đang tải...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="card chart-container">
+                        <h4><i class="fa-solid fa-chart-pie"></i> Cơ cấu chi tiêu tháng này</h4>
+                        <div style="height: 300px; position: relative; width: 100%;">
+                            <canvas id="myPieChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card recent-transactions">
+                        <h4><i class="fa-solid fa-clock-rotate-left"></i> Vừa mới nhập</h4>
+                        <p style="color: gray; font-style: italic; margin-top: 10px;">Chưa có giao dịch nào...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="common.js"></script> 
+    
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>

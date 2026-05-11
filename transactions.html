@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ Giao Dịch - MyWallet</title>
+    
+    <link rel="stylesheet" href="css/style_dashboard.css">
+    <link rel="stylesheet" href="css/style_transactions.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-brand"><h2><i class="fa-solid fa-wallet"></i> MyWallet</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+                <li><a href="input.html"><i class="fa-solid fa-circle-plus"></i> Nhập Thu/Chi</a></li>
+                <li class="active"><a href="transactions.html"><i class="fa-solid fa-list-ul"></i> Sổ Giao Dịch</a></li>
+                <li><a href="report.html"><i class="fa-solid fa-chart-pie"></i> Báo Cáo</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user-gear"></i> Tài khoản</a></li>
+                <li><a href="#" onclick="dangXuat()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <h3>Lịch Sử Giao Dịch</h3>
+                <div class="user-info">
+                    <span id="user-name">...</span>
+                    <div class="avatar-circle">
+                         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width: 100%; border-radius: 50%;">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="table-container">
+                    <h4 style="margin-bottom: 20px; color: #555;">Toàn bộ danh sách</h4>
+                    
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Danh mục</th>
+                                <th>Ghi chú</th>
+                                <th>Loại</th>
+                                <th>Số tiền</th>
+                                <th style="text-align: center;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="js/transactions.js"></script>
+</body>
+</html>

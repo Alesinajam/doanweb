@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo - MyWallet</title>
+    
+    <link rel="stylesheet" href="css/style_dashboard.css">
+    <link rel="stylesheet" href="css/style_report.css"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-brand"><h2><i class="fa-solid fa-wallet"></i> MyWallet</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Tổng quan</a></li>
+                <li><a href="input.html"><i class="fa-solid fa-circle-plus"></i> Nhập Thu/Chi</a></li>
+                <li><a href="transactions.html"><i class="fa-solid fa-list-ul"></i> Sổ Giao Dịch</a></li>
+                <li class="active"><a href="report.html"><i class="fa-solid fa-chart-pie"></i> Báo Cáo</a></li>
+                <li><a href="profile.html"><i class="fa-solid fa-user-gear"></i> Tài khoản</a></li>
+                <li><a href="#" onclick="dangXuat()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <h3>Báo Cáo Chi Tiêu</h3>
+                <div class="user-info"><span id="user-name">...</span></div>
+            </header>
+
+            <div class="content-body">
+                <div class="filter-bar">
+                    <label><i class="fa-solid fa-calendar"></i> Xem báo cáo tháng:</label>
+                    <input type="month" id="month-picker">
+                    <button class="btn-filter" onclick="taiBaoCao()">Xem Ngay</button>
+                    
+                    <button class="btn-filter" style="background:#1cc88a; margin-left: auto;" onclick="moModal()">
+                        <i class="fa-solid fa-gear"></i> Cài Hạn Mức
+                    </button>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Tỷ lệ chi tiêu theo danh mục</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>So sánh Hạn Mức (Thực tế vs Kế hoạch)</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="budgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cài Đặt Hạn Mức</h3>
+                <button class="close-btn" onclick="dongModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Chọn Danh Mục (Chi tiêu)</label>
+                <select id="budget-category" class="form-control">
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label>Số tiền giới hạn (VNĐ)</label>
+                <input type="number" id="budget-amount" class="form-control" placeholder="Ví dụ: 3000000">
+            </div>
+            
+            <p style="font-size: 13px; color: gray;">* Áp dụng cho tháng bạn đang xem báo cáo.</p>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="dongModal()">Hủy</button>
+                <button class="btn-primary" onclick="luuHanMuc()">Lưu Lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="js/report.js"></script>
+</body>
+</html>
