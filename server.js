@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise'); // Dùng bản /promise để chạy được async/await mượt mà
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path'); // Đưa hết require lên đầu trang cho sạch sẽ
 
 const app = express();
 app.use(cors());
@@ -19,12 +20,22 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// --- CẤU HÌNH PHỤC VỤ STATIC FILES ---
+// Cấu hình phục vụ các file tĩnh (HTML, CSS, JS) nằm ở thư mục cha (first_web-main)
+app.use(express.static(path.join(__dirname, '..')));
+
+// Route gốc trả về giao diện chính khi người dùng truy cập tên miền
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'input.html')); // Hoặc login.html tùy bạn chọn làm trang chủ
+});
+
+// ==================== HỆ THỐNG API ====================
+
 // 2. API Đăng Nhập
 app.post('/api/login', async (req, res) => {
     try {
         const { TenDangNhap, MatKhau } = req.body;
 
-        // Trong MySQL, ta dùng dấu "?" để truyền tham số an toàn (tránh SQL Injection)
         const [rows] = await pool.query(
             'SELECT * FROM NGUOIDUNG WHERE TenDangNhap = ? AND MatKhau = ?',
             [TenDangNhap, MatKhau]
@@ -34,7 +45,7 @@ app.post('/api/login', async (req, res) => {
             res.json({ 
                 success: true, 
                 message: 'Đăng nhập thành công', 
-                data: rows[0] // rows[0] tương đương với recordset[0] bên SQL Server
+                data: rows[0] 
             });
         } else {
             res.json({ success: false, message: 'Sai tài khoản hoặc mật khẩu' });
@@ -54,7 +65,6 @@ app.get('/api/dashboard', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Thiếu ID người dùng' });
         }
 
-        // Thay đổi chữ N'Thu' thành 'Thu' vì MySQL không cần tiền tố N cho chuỗi Unicode nếu DB đã cấu hình UTF8
         const sqlQuery = `
             SELECT 
                 SUM(CASE WHEN d.LoaiGiaoDich = 'Thu' THEN g.SoTien ELSE 0 END) AS TongThu,
@@ -158,7 +168,6 @@ app.get('/api/transactions/history', async (req, res) => {
         const { userId, limit } = req.query; 
         const parsedLimit = parseInt(limit) || 1000;
 
-        // Cú pháp LIMIT trong MySQL nằm ở cuối câu lệnh thay vì dùng TOP ở đầu như SQL Server
         let queryStr = `
             SELECT g.MaGiaoDich, g.SoTien, g.GhiChu, g.NgayGiaoDich, d.TenDanhMuc, d.LoaiGiaoDich 
             FROM GIAODICH g
@@ -205,7 +214,6 @@ app.get('/api/report/budget-comparison', async (req, res) => {
     try {
         const { userId, month, year } = req.query;
 
-        // Thay ISNULL bằng IFNULL vì MySQL sử dụng hàm IFNULL
         const query = `
             SELECT 
                 d.TenDanhMuc, 
@@ -314,7 +322,6 @@ app.post('/api/register', async (req, res) => {
             return res.json({ success: false, message: 'Tên đăng nhập này đã có người dùng!' });
         }
 
-        // Trong MySQL không dùng OUTPUT INSERTED, ta lấy ID vừa tạo thông qua thuộc tính insertId của kết quả trả về
         const [insertResult] = await pool.query(
             'INSERT INTO NGUOIDUNG (TenDangNhap, MatKhau, HoTen, NgheNghiep) VALUES (?, ?, ?, ?)',
             [TenDangNhap, MatKhau, HoTen, NgheNghiep]
@@ -323,37 +330,4 @@ app.post('/api/register', async (req, res) => {
         const newUserId = insertResult.insertId; 
 
         const queryDefaultCategories = `
-            INSERT INTO DANHMUC (TenDanhMuc, LoaiGiaoDich, MaNguoiDung) VALUES 
-            ('Ăn uống', 'Chi', ?),
-            ('Di chuyển', 'Chi', ?),
-            ('Tiền nhà', 'Chi', ?),
-            ('Mua sắm', 'Chi', ?),
-            ('Lương cứng', 'Thu', ?),
-            ('Thưởng', 'Thu', ?),
-            ('Khác', 'Thu', ?)
-        `;
-
-        await pool.query(queryDefaultCategories, [
-            newUserId, newUserId, newUserId, newUserId, newUserId, newUserId, newUserId
-        ]);
-
-        res.json({ success: true, message: 'Đăng ký thành công! Đã tạo sẵn danh mục cho bạn.' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Lỗi đăng ký' });
-    }
-});
-// Cấu hình phục vụ các file tĩnh (HTML, CSS, JS) nằm ở thư mục cha (first_web-main)
-const path = require('path');
-app.use(express.static(path.join(__dirname, '..')));
-
-// Route gốc trả về giao diện trang nhập liệu hoặc đăng nhập khi truy cập đường dẫn chính
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'input.html')); // Hoặc thay bằng file login.html của bạn
-});
-
-// Cổng phát cho môi trường Production
-const PORT = process.env.PORT || 3000; 
-app.listen(PORT, () => {
-    console.log(`Server Backend đang chạy tại port: ${PORT}`);
-});
+            INSERT INTO DANHMUC (TenDanhMuc, Lo
