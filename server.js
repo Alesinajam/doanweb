@@ -422,10 +422,8 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi đăng ký' });
     }
 });
+const PORT = process.env.PORT || 3000; 
 
-
-
-// Chạy server tại cổng 3000
-app.listen(3000, () => {
-    console.log('Server Backend đang chạy tại http://localhost:3000');
+app.listen(PORT, () => {
+    console.log(`Server Backend đang chạy tại port: ${PORT}`);
 });
