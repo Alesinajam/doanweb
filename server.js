@@ -343,6 +343,14 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi đăng ký' });
     }
 });
+// Cấu hình phục vụ các file tĩnh (HTML, CSS, JS) nằm ở thư mục cha (first_web-main)
+const path = require('path');
+app.use(express.static(path.join(__dirname, '..')));
+
+// Route gốc trả về giao diện trang nhập liệu hoặc đăng nhập khi truy cập đường dẫn chính
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'input.html')); // Hoặc thay bằng file login.html của bạn
+});
 
 // Cổng phát cho môi trường Production
 const PORT = process.env.PORT || 3000; 
