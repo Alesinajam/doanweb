@@ -1,0 +1,59 @@
+/* style_transactions.css */
+
+/* Giao diện Bảng */
+.table-container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.custom-table th, .custom-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.custom-table th {
+    background-color: #f8f9fc;
+    color: #4e73df;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.custom-table tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Badge (Nhãn màu) cho cột Loại */
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+.badge-income { background-color: #1cc88a; }
+.badge-expense { background-color: #e74a3b; }
+
+.btn-delete {
+    background-color: #ffebee; /* Nền đỏ nhạt */
+    color: #e74a3b; /* Chữ đỏ đậm */
+    border: 1px solid #e74a3b;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #e74a3b;
+    color: white;
+}

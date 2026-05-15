@@ -1,0 +1,198 @@
+/* --- CẤU HÌNH CHUNG & MÀU SẮC --- */
+:root {
+    --primary-color: #4e73df; /* Xanh dương chủ đạo (giống Dashboard) */
+    --secondary-color: #1cc88a; /* Xanh lá điểm nhấn */
+    --text-dark: #2c3e50;
+    --text-gray: #858796;
+    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif; /* Font chữ tròn trịa, hiện đại */
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; /* Để đẩy Footer xuống đáy */
+}
+
+/* --- 1. HEADER --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    position: fixed; /* Cố định trên đầu */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    /* Hiệu ứng kính mờ (Glassmorphism) */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: 1px;
+}
+
+.logo .big-q {
+    font-size: 40px;
+    color: var(--primary-color);
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 16px;
+    transition: 0.3s;
+    position: relative;
+}
+
+/* Hiệu ứng gạch chân chạy ra khi di chuột */
+.navbar a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: -5px;
+    left: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s;
+}
+
+.navbar a:hover::after, .navbar a.active::after {
+    width: 100%;
+}
+
+.search-icon {
+    color: var(--text-gray);
+    font-size: 18px;
+    transition: 0.3s;
+}
+.search-icon:hover { color: var(--primary-color); transform: scale(1.1); }
+
+
+/* --- 2. HERO SECTION (Nội dung chính) --- */
+.hero-section {
+    flex: 1; /* Chiếm hết khoảng trống để đẩy footer xuống */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-top: 100px; /* Tránh bị Header che mất */
+    padding-bottom: 50px;
+}
+
+.hero-content {
+    max-width: 800px;
+    animation: fadeIn 1s ease-in-out; /* Hiệu ứng hiện ra từ từ */
+}
+
+.avatar-container {
+    margin-bottom: 20px;
+}
+
+.team-avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    background: white;
+}
+
+h1 {
+    font-size: 48px;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: var(--text-gray);
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+/* Nút bấm xịn xò */
+.btn-main {
+    display: inline-block;
+    padding: 15px 40px;
+    background: linear-gradient(to right, #1cc88a, #13855c); /* Gradient xanh lá */
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 50px;
+    box-shadow: 0 10px 20px rgba(28, 200, 138, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-main:hover {
+    transform: translateY(-3px); /* Nổi lên khi di chuột */
+    box-shadow: 0 15px 25px rgba(28, 200, 138, 0.6);
+}
+
+/* --- 3. FOOTER (Chân trang) --- */
+.main-footer {
+    background: white;
+    padding: 20px 0;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.footer-content p {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.team-members {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.team-members span {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.team-members ul {
+    list-style: none;
+    display: flex;
+    gap: 20px; /* Các tên nằm ngang */
+}
+
+.team-members li {
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+/* Animation đơn giản */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

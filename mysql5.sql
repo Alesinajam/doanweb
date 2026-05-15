@@ -1,0 +1,6 @@
+USE QuanLyChiTieuCN;
+SELECT * FROM GIAODICH ORDER BY MaGiaoDich DESC;
+INSERT INTO HANMUC (MaNguoiDung, MaDanhMuc, SoTienHanMuc, Thang, Nam)
+VALUES 
+(1, 3, 3000000, 1, 2026), 
+(1, 4, 1500000, 1, 2026);

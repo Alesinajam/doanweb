@@ -1,0 +1,74 @@
+/* style_login.css - Chỉ dành riêng cho trang Login */
+
+/* 1. Cấu hình cơ bản */
+body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Màu nền */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+/* 2. Nút quay lại */
+.back-home-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+}
+
+/* 3. Khung Form */
+.login-form {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 350px;
+    text-align: center;
+}
+
+.login-form h2 {
+    margin-bottom: 20px;
+    color: #4e73df; /* Màu xanh chủ đạo */
+}
+
+/* 4. Ô nhập liệu */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Quan trọng để không bị vỡ khung */
+}
+
+/* 5. Nút bấm */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: #1cc88a; /* Màu xanh lá */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #17a673;
+}

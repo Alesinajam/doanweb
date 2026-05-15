@@ -1,0 +1,52 @@
+/* style_profile.css */
+
+.profile-card {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: 0 auto; /* Căn giữa */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-group label { 
+    display: block; 
+    font-weight: bold; 
+    margin-bottom: 8px; 
+    color: #4e73df; 
+}
+
+.form-control {
+    width: 100%; 
+    padding: 12px;
+    border: 1px solid #ddd; 
+    border-radius: 8px;
+    font-size: 16px; 
+    font-family: 'Nunito';
+}
+
+.form-control:disabled { 
+    background: #f1f1f1; 
+    color: #888; 
+    cursor: not-allowed; 
+}
+
+.btn-save {
+    background: #1cc88a; 
+    color: white;
+    padding: 12px 30px; 
+    border: none; 
+    border-radius: 8px;
+    font-weight: bold; 
+    font-size: 16px; 
+    cursor: pointer;
+    transition: 0.3s; 
+    width: 100%;
+}
+
+.btn-save:hover { 
+    background: #17a673; 
+    transform: translateY(-2px); 
+}

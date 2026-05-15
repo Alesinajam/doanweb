@@ -1,0 +1,3 @@
+ALTER USER 'admin_web'@'localhost' ACCOUNT UNLOCK;
+ALTER USER 'admin_web'@'localhost' IDENTIFIED BY '123456';
+FLUSH PRIVILEGES;

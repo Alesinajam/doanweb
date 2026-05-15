@@ -1,0 +1,83 @@
+/* style_chat.css - Style riêng cho khung chat lịch sử */
+
+.chat-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Khoảng cách giữa các tin nhắn */
+    max-height: 320px; /* Giới hạn chiều cao */
+    overflow-y: auto; /* Cho phép cuộn nếu danh sách dài */
+    padding-right: 5px; /* Tránh thanh cuộn che nội dung */
+}
+
+/* Thanh cuộn đẹp */
+.chat-list::-webkit-scrollbar { width: 5px; }
+.chat-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+.chat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px; /* Thu nhỏ padding */
+    border-radius: 12px;
+    font-size: 14px; /* Chữ nhỏ lại một chút */
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* --- Style cho Khoản THU (Màu xanh) --- */
+.chat-item.income {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border-left: 4px solid #198754;
+}
+
+/* --- Style cho Khoản CHI (Màu đỏ) --- */
+.chat-item.expense {
+    background-color: #f8d7da;
+    color: #842029;
+    border-left: 4px solid #dc3545;
+}
+
+/* --- Các thành phần con --- */
+.chat-icon-box {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.chat-info {
+    flex: 1; /* Chiếm phần còn lại */
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-title {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Nếu tên dài quá thì hiện dấu ... */
+    max-width: 120px; /* Giới hạn chiều rộng tên */
+}
+
+.chat-date {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.chat-amount {
+    font-weight: 800;
+    font-size: 14px;
+    white-space: nowrap; /* Không xuống dòng số tiền */
+}

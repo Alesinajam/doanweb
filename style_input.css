@@ -1,0 +1,99 @@
+/* style_input.css - Dành riêng cho trang Nhập Thu/Chi */
+
+/* 1. Nút chuyển đổi Thu/Chi (Toggle) */
+.toggle-container {
+    display: flex;
+    background: #e0e0e0;
+    border-radius: 30px;
+    padding: 5px;
+    margin-bottom: 25px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto; /* Căn giữa nút */
+}
+
+.toggle-btn {
+    padding: 10px 40px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    background: transparent;
+    color: #555;
+    transition: all 0.3s ease; /* Hiệu ứng chuyển màu mượt */
+}
+
+/* Trạng thái đang chọn (Active) */
+.toggle-btn.active-expense {
+    background: #e74a3b; /* Màu đỏ */
+    color: white;
+    box-shadow: 0 4px 10px rgba(231, 74, 59, 0.4);
+}
+
+.toggle-btn.active-income {
+    background: #1cc88a; /* Màu xanh */
+    color: white;
+    box-shadow: 0 4px 10px rgba(28, 200, 138, 0.4);
+}
+
+/* 2. Khung Form nhập liệu (Card trắng) */
+.input-card {
+    max-width: 500px;
+    margin: 0 auto; /* Căn giữa khung */
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Đổ bóng nhẹ */
+}
+
+/* 3. Các ô nhập liệu */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #4e73df; /* Màu xanh chủ đạo của web */
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: #4e73df; /* Đổi màu viền khi bấm vào */
+}
+
+/* 4. Nút Lưu (Submit) */
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px); /* Hiệu ứng nổi lên khi di chuột */
+}
+
+/* Màu nút đổi theo loại giao dịch */
+.btn-expense { background: #e74a3b; }
+.btn-expense:hover { background: #c0392b; }
+
+.btn-income { background: #1cc88a; }
+.btn-income:hover { background: #17a673; }

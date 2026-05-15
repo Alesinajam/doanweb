@@ -1,0 +1,44 @@
+/* style_register.css */
+body {
+    background-color: #4e73df; /* Màu xanh chủ đạo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+}
+
+.register-card {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 400px;
+    text-align: center;
+}
+
+.register-card h2 { color: #333; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+.form-control {
+    width: 100%; padding: 10px;
+    border: 1px solid #ccc; border-radius: 5px;
+    font-size: 16px; box-sizing: border-box; /* Quan trọng để không bị vỡ khung */
+}
+
+.btn-register {
+    width: 100%; padding: 12px;
+    background: #1cc88a; color: white; /* Màu xanh lá */
+    border: none; border-radius: 5px;
+    font-size: 16px; font-weight: bold; cursor: pointer;
+    transition: 0.3s; margin-top: 10px;
+}
+.btn-register:hover { background: #17a673; }
+
+.link-login {
+    display: block; margin-top: 20px;
+    color: #4e73df; text-decoration: none; font-size: 14px;
+}
+.link-login:hover { text-decoration: underline; }
