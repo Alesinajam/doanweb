@@ -1,5 +1,5 @@
 const express = require('express');
-const sql = require('mssql'); // Đã sửa từ mysql2 thành mssql để khớp với cú pháp code của bạn
+const mysql = require('mysql2/promise'); // Dùng bản /promise để chạy được async/await mượt mà
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -7,35 +7,34 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Cấu hình kết nối Database động (Chạy mượt ở cả Local lẫn Cloud)
-const config = {
+// Cấu hình kết nối MySQL động (Lấy từ biến môi trường Railway hoặc chạy Local)
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'admin_web',
     password: process.env.DB_PASSWORD || '123456',
-    server: process.env.DB_HOST || 'localhost', 
     database: process.env.DB_NAME || 'QuanLyChiTieuCN',
-    port: parseInt(process.env.DB_PORT) || 1433,        
-    options: {
-        encrypt: process.env.NODE_ENV === 'production', // Tự động mã hóa bảo mật khi lên production
-        trustServerCertificate: true
-    }
-};
+    port: parseInt(process.env.DB_PORT) || 3306, // Cổng mặc định của MySQL là 3306
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
 // 2. API Đăng Nhập
 app.post('/api/login', async (req, res) => {
     try {
-        let pool = await sql.connect(config);
         const { TenDangNhap, MatKhau } = req.body;
 
-        const result = await pool.request()
-            .input('user', sql.NVarChar, TenDangNhap)
-            .input('pass', sql.NVarChar, MatKhau)
-            .query('SELECT * FROM NGUOIDUNG WHERE TenDangNhap = @user AND MatKhau = @pass');
+        // Trong MySQL, ta dùng dấu "?" để truyền tham số an toàn (tránh SQL Injection)
+        const [rows] = await pool.query(
+            'SELECT * FROM NGUOIDUNG WHERE TenDangNhap = ? AND MatKhau = ?',
+            [TenDangNhap, MatKhau]
+        );
 
-        if (result.recordset.length > 0) {
+        if (rows.length > 0) {
             res.json({ 
                 success: true, 
                 message: 'Đăng nhập thành công', 
-                data: result.recordset[0]
+                data: rows[0] // rows[0] tương đương với recordset[0] bên SQL Server
             });
         } else {
             res.json({ success: false, message: 'Sai tài khoản hoặc mật khẩu' });
@@ -46,29 +45,28 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 3. API Lấy thông tin Dashboard
+// 3. API Lấy thông tin Dashboard (Tổng Thu, Tổng Chi, Số Dư)
 app.get('/api/dashboard', async (req, res) => {
     try {
         const maNguoiDung = req.query.id; 
+
         if (!maNguoiDung) {
             return res.status(400).json({ success: false, message: 'Thiếu ID người dùng' });
         }
 
-        let pool = await sql.connect(config);
+        // Thay đổi chữ N'Thu' thành 'Thu' vì MySQL không cần tiền tố N cho chuỗi Unicode nếu DB đã cấu hình UTF8
         const sqlQuery = `
             SELECT 
-                SUM(CASE WHEN d.LoaiGiaoDich = N'Thu' THEN g.SoTien ELSE 0 END) AS TongThu,
-                SUM(CASE WHEN d.LoaiGiaoDich = N'Chi' THEN g.SoTien ELSE 0 END) AS TongChi
+                SUM(CASE WHEN d.LoaiGiaoDich = 'Thu' THEN g.SoTien ELSE 0 END) AS TongThu,
+                SUM(CASE WHEN d.LoaiGiaoDich = 'Chi' THEN g.SoTien ELSE 0 END) AS TongChi
             FROM GIAODICH g
             JOIN DANHMUC d ON g.MaDanhMuc = d.MaDanhMuc
-            WHERE g.MaNguoiDung = @userId
+            WHERE g.MaNguoiDung = ?
         `;
 
-        const result = await pool.request()
-            .input('userId', sql.Int, maNguoiDung)
-            .query(sqlQuery);
-
-        const data = result.recordset[0];
+        const [rows] = await pool.query(sqlQuery, [maNguoiDung]);
+        const data = rows[0];
+        
         const soDu = (data.TongThu || 0) - (data.TongChi || 0);
 
         res.json({
@@ -89,13 +87,13 @@ app.get('/api/profile', async (req, res) => {
         const userId = req.query.id;
         if (!userId) return res.status(400).json({ success: false, message: 'Thiếu ID' });
 
-        let pool = await sql.connect(config);
-        const result = await pool.request()
-            .input('id', sql.Int, userId)
-            .query('SELECT TenDangNhap, HoTen, NgheNghiep FROM NGUOIDUNG WHERE MaNguoiDung = @id');
+        const [rows] = await pool.query(
+            'SELECT TenDangNhap, HoTen, NgheNghiep FROM NGUOIDUNG WHERE MaNguoiDung = ?',
+            [userId]
+        );
 
-        if (result.recordset.length > 0) {
-            res.json({ success: true, data: result.recordset[0] });
+        if (rows.length > 0) {
+            res.json({ success: true, data: rows[0] });
         } else {
             res.json({ success: false, message: 'Không tìm thấy user' });
         }
@@ -108,12 +106,11 @@ app.get('/api/profile', async (req, res) => {
 app.post('/api/profile/update', async (req, res) => {
     try {
         const { MaNguoiDung, HoTen, NgheNghiep } = req.body;
-        let pool = await sql.connect(config);
-        await pool.request()
-            .input('id', sql.Int, MaNguoiDung)
-            .input('hoten', sql.NVarChar, HoTen)
-            .input('nghenghiep', sql.NVarChar, NgheNghiep)
-            .query('UPDATE NGUOIDUNG SET HoTen = @hoten, NgheNghiep = @nghenghiep WHERE MaNguoiDung = @id');
+
+        await pool.query(
+            'UPDATE NGUOIDUNG SET HoTen = ?, NgheNghiep = ? WHERE MaNguoiDung = ?',
+            [HoTen, NgheNghiep, MaNguoiDung]
+        );
 
         res.json({ success: true, message: 'Cập nhật thành công!' });
     } catch (err) {
@@ -122,17 +119,17 @@ app.post('/api/profile/update', async (req, res) => {
     }
 });
 
-// 6. API Lấy danh sách danh mục
+// 6. API Lấy danh sách danh mục (Để hiện lên Dropdown)
 app.get('/api/categories', async (req, res) => {
     try {
         const { userId, type } = req.query; 
-        let pool = await sql.connect(config);
-        const result = await pool.request()
-            .input('uid', sql.Int, userId)
-            .input('type', sql.NVarChar, type)
-            .query('SELECT MaDanhMuc, TenDanhMuc FROM DANHMUC WHERE MaNguoiDung = @uid AND LoaiGiaoDich = @type');
+        
+        const [rows] = await pool.query(
+            'SELECT MaDanhMuc, TenDanhMuc FROM DANHMUC WHERE MaNguoiDung = ? AND LoaiGiaoDich = ?',
+            [userId, type]
+        );
 
-        res.json({ success: true, data: result.recordset });
+        res.json({ success: true, data: rows });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Lỗi lấy danh mục' });
     }
@@ -142,17 +139,11 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/transaction/add', async (req, res) => {
     try {
         const { MaNguoiDung, MaDanhMuc, SoTien, GhiChu, NgayGiaoDich } = req.body;
-        let pool = await sql.connect(config);
-        await pool.request()
-            .input('uid', sql.Int, MaNguoiDung)
-            .input('catId', sql.Int, MaDanhMuc)
-            .input('amount', sql.Decimal, SoTien)
-            .input('note', sql.NVarChar, GhiChu)
-            .input('date', sql.Date, NgayGiaoDich)
-            .query(`
-                INSERT INTO GIAODICH (MaNguoiDung, MaDanhMuc, SoTien, GhiChu, NgayGiaoDich)
-                VALUES (@uid, @catId, @amount, @note, @date)
-            `);
+
+        await pool.query(
+            'INSERT INTO GIAODICH (MaNguoiDung, MaDanhMuc, SoTien, GhiChu, NgayGiaoDich) VALUES (?, ?, ?, ?, ?)',
+            [MaNguoiDung, MaDanhMuc, SoTien, GhiChu, NgayGiaoDich]
+        );
 
         res.json({ success: true, message: 'Đã lưu giao dịch!' });
     } catch (err) {
@@ -164,24 +155,22 @@ app.post('/api/transaction/add', async (req, res) => {
 // 8. API Lấy lịch sử giao dịch
 app.get('/api/transactions/history', async (req, res) => {
     try {
-        const { userId, limit } = req.query;
-        let pool = await sql.connect(config);
-        
+        const { userId, limit } = req.query; 
+        const parsedLimit = parseInt(limit) || 1000;
+
+        // Cú pháp LIMIT trong MySQL nằm ở cuối câu lệnh thay vì dùng TOP ở đầu như SQL Server
         let queryStr = `
-            SELECT TOP ${limit || 1000} 
-                g.MaGiaoDich, g.SoTien, g.GhiChu, g.NgayGiaoDich, 
-                d.TenDanhMuc, d.LoaiGiaoDich 
+            SELECT g.MaGiaoDich, g.SoTien, g.GhiChu, g.NgayGiaoDich, d.TenDanhMuc, d.LoaiGiaoDich 
             FROM GIAODICH g
             JOIN DANHMUC d ON g.MaDanhMuc = d.MaDanhMuc
-            WHERE g.MaNguoiDung = @uid
+            WHERE g.MaNguoiDung = ?
             ORDER BY g.NgayGiaoDich DESC, g.MaGiaoDich DESC
+            LIMIT ?
         `;
 
-        const result = await pool.request()
-            .input('uid', sql.Int, userId)
-            .query(queryStr);
+        const [rows] = await pool.query(queryStr, [parseInt(userId), parsedLimit]);
 
-        res.json({ success: true, data: result.recordset });
+        res.json({ success: true, data: rows });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Lỗi lấy lịch sử' });
@@ -192,57 +181,50 @@ app.get('/api/transactions/history', async (req, res) => {
 app.get('/api/report/expense-by-category', async (req, res) => {
     try {
         const { userId, month, year } = req.query;
-        let pool = await sql.connect(config);
-        const result = await pool.request()
-            .input('uid', sql.Int, userId)
-            .input('month', sql.Int, month)
-            .input('year', sql.Int, year)
-            .query(`
-                SELECT d.TenDanhMuc, SUM(g.SoTien) as TongTien
-                FROM GIAODICH g
-                JOIN DANHMUC d ON g.MaDanhMuc = d.MaDanhMuc
-                WHERE g.MaNguoiDung = @uid 
-                  AND d.LoaiGiaoDich = 'Chi'
-                  AND MONTH(g.NgayGiaoDich) = @month 
-                  AND YEAR(g.NgayGiaoDich) = @year
-                GROUP BY d.TenDanhMuc
-            `);
 
-        res.json({ success: true, data: result.recordset });
+        const [rows] = await pool.query(`
+            SELECT d.TenDanhMuc, SUM(g.SoTien) as TongTien
+            FROM GIAODICH g
+            JOIN DANHMUC d ON g.MaDanhMuc = d.MaDanhMuc
+            WHERE g.MaNguoiDung = ? 
+              AND d.LoaiGiaoDich = 'Chi'
+              AND MONTH(g.NgayGiaoDich) = ? 
+              AND YEAR(g.NgayGiaoDich) = ?
+            GROUP BY d.TenDanhMuc
+        `, [userId, month, year]);
+
+        res.json({ success: true, data: rows });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Lỗi báo cáo' });
     }
 });
 
-// 10. API Báo cáo: Biểu đồ cột
+// 10. API Báo cáo: So sánh Hạn Mức vs Thực Tế (Vẽ biểu đồ cột)
 app.get('/api/report/budget-comparison', async (req, res) => {
     try {
         const { userId, month, year } = req.query;
-        let pool = await sql.connect(config);
+
+        // Thay ISNULL bằng IFNULL vì MySQL sử dụng hàm IFNULL
         const query = `
             SELECT 
                 d.TenDanhMuc, 
                 h.SoTienHanMuc, 
-                ISNULL(SUM(g.SoTien), 0) AS ThucTe
+                IFNULL(SUM(g.SoTien), 0) AS ThucTe
             FROM HANMUC h
             JOIN DANHMUC d ON h.MaDanhMuc = d.MaDanhMuc
             LEFT JOIN GIAODICH g ON h.MaDanhMuc = g.MaDanhMuc 
-                                 AND MONTH(g.NgayGiaoDich) = @month 
-                                 AND YEAR(g.NgayGiaoDich) = @year
-            WHERE h.MaNguoiDung = @uid 
-              AND h.Thang = @month 
-              AND h.Nam = @year
+                                 AND MONTH(g.NgayGiaoDich) = ? 
+                                 AND YEAR(g.NgayGiaoDich) = ?
+            WHERE h.MaNguoiDung = ? 
+              AND h.Thang = ? 
+              AND h.Nam = ?
             GROUP BY d.TenDanhMuc, h.SoTienHanMuc
         `;
 
-        const result = await pool.request()
-            .input('uid', sql.Int, userId)
-            .input('month', sql.Int, month)
-            .input('year', sql.Int, year)
-            .query(query);
+        const [rows] = await pool.query(query, [month, year, userId, month, year]);
 
-        res.json({ success: true, data: result.recordset });
+        res.json({ success: true, data: rows });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Lỗi lấy hạn mức' });
@@ -253,28 +235,22 @@ app.get('/api/report/budget-comparison', async (req, res) => {
 app.post('/api/budget/set', async (req, res) => {
     try {
         const { MaNguoiDung, MaDanhMuc, SoTienHanMuc, Thang, Nam } = req.body;
-        let pool = await sql.connect(config);
-        
-        const check = await pool.request()
-            .input('uid', sql.Int, MaNguoiDung)
-            .input('catId', sql.Int, MaDanhMuc)
-            .input('month', sql.Int, Thang)
-            .input('year', sql.Int, Nam)
-            .query(`SELECT MaHanMuc FROM HANMUC WHERE MaNguoiDung = @uid AND MaDanhMuc = @catId AND Thang = @month AND Nam = @year`);
 
-        if (check.recordset.length > 0) {
-            await pool.request()
-                .input('amount', sql.Decimal, SoTienHanMuc)
-                .input('id', sql.Int, check.recordset[0].MaHanMuc)
-                .query(`UPDATE HANMUC SET SoTienHanMuc = @amount WHERE MaHanMuc = @id`);
+        const [check] = await pool.query(
+            `SELECT MaHanMuc FROM HANMUC WHERE MaNguoiDung = ? AND MaDanhMuc = ? AND Thang = ? AND Nam = ?`,
+            [MaNguoiDung, MaDanhMuc, Thang, Nam]
+        );
+
+        if (check.length > 0) {
+            await pool.query(
+                `UPDATE HANMUC SET SoTienHanMuc = ? WHERE MaHanMuc = ?`,
+                [SoTienHanMuc, check[0].MaHanMuc]
+            );
         } else {
-            await pool.request()
-                .input('uid', sql.Int, MaNguoiDung)
-                .input('catId', sql.Int, MaDanhMuc)
-                .input('amount', sql.Decimal, SoTienHanMuc)
-                .input('month', sql.Int, Thang)
-                .input('year', sql.Int, Nam)
-                .query(`INSERT INTO HANMUC (MaNguoiDung, MaDanhMuc, SoTienHanMuc, Thang, Nam) VALUES (@uid, @catId, @amount, @month, @year)`);
+            await pool.query(
+                `INSERT INTO HANMUC (MaNguoiDung, MaDanhMuc, SoTienHanMuc, Thang, Nam) VALUES (?, ?, ?, ?, ?)`,
+                [MaNguoiDung, MaDanhMuc, SoTienHanMuc, Thang, Nam]
+            );
         }
 
         res.json({ success: true, message: 'Đã lưu hạn mức!' });
@@ -288,10 +264,8 @@ app.post('/api/budget/set', async (req, res) => {
 app.delete('/api/transaction/delete', async (req, res) => {
     try {
         const { id } = req.body;
-        let pool = await sql.connect(config);
-        await pool.request()
-            .input('id', sql.Int, id)
-            .query('DELETE FROM GIAODICH WHERE MaGiaoDich = @id');
+
+        await pool.query('DELETE FROM GIAODICH WHERE MaGiaoDich = ?', [id]);
 
         res.json({ success: true, message: 'Đã xóa thành công!' });
     } catch (err) {
@@ -304,21 +278,20 @@ app.delete('/api/transaction/delete', async (req, res) => {
 app.post('/api/profile/change-password', async (req, res) => {
     try {
         const { MaNguoiDung, MatKhauCu, MatKhauMoi } = req.body;
-        let pool = await sql.connect(config);
 
-        const check = await pool.request()
-            .input('uid', sql.Int, MaNguoiDung)
-            .input('oldPass', sql.NVarChar, MatKhauCu)
-            .query('SELECT * FROM NGUOIDUNG WHERE MaNguoiDung = @uid AND MatKhau = @oldPass');
+        const [check] = await pool.query(
+            'SELECT * FROM NGUOIDUNG WHERE MaNguoiDung = ? AND MatKhau = ?',
+            [MaNguoiDung, MatKhauCu]
+        );
 
-        if (check.recordset.length === 0) {
+        if (check.length === 0) {
             return res.json({ success: false, message: 'Mật khẩu cũ không đúng!' });
         }
 
-        await pool.request()
-            .input('uid', sql.Int, MaNguoiDung)
-            .input('newPass', sql.NVarChar, MatKhauMoi)
-            .query('UPDATE NGUOIDUNG SET MatKhau = @newPass WHERE MaNguoiDung = @uid');
+        await pool.query(
+            'UPDATE NGUOIDUNG SET MatKhau = ? WHERE MaNguoiDung = ?',
+            [MatKhauMoi, MaNguoiDung]
+        );
 
         res.json({ success: true, message: 'Đổi mật khẩu thành công!' });
     } catch (err) {
@@ -327,47 +300,42 @@ app.post('/api/profile/change-password', async (req, res) => {
     }
 });
 
-// 14. API Đăng ký tài khoản mới
+// 14. API Đăng ký tài khoản mới (PHIÊN BẢN MYSQL)
 app.post('/api/register', async (req, res) => {
     try {
         const { TenDangNhap, MatKhau, HoTen, NgheNghiep } = req.body;
-        let pool = await sql.connect(config);
 
-        const checkUser = await pool.request()
-            .input('user', sql.NVarChar, TenDangNhap)
-            .query('SELECT * FROM NGUOIDUNG WHERE TenDangNhap = @user');
+        const [checkUser] = await pool.query(
+            'SELECT * FROM NGUOIDUNG WHERE TenDangNhap = ?', 
+            [TenDangNhap]
+        );
 
-        if (checkUser.recordset.length > 0) {
+        if (checkUser.length > 0) {
             return res.json({ success: false, message: 'Tên đăng nhập này đã có người dùng!' });
         }
 
-        const insertResult = await pool.request()
-            .input('user', sql.NVarChar, TenDangNhap)
-            .input('pass', sql.NVarChar, MatKhau)
-            .input('name', sql.NVarChar, HoTen)
-            .input('job', sql.NVarChar, NgheNghiep)
-            .query(`
-                INSERT INTO NGUOIDUNG (TenDangNhap, MatKhau, HoTen, NgheNghiep)
-                OUTPUT INSERTED.MaNguoiDung 
-                VALUES (@user, @pass, @name, @job)
-            `);
+        // Trong MySQL không dùng OUTPUT INSERTED, ta lấy ID vừa tạo thông qua thuộc tính insertId của kết quả trả về
+        const [insertResult] = await pool.query(
+            'INSERT INTO NGUOIDUNG (TenDangNhap, MatKhau, HoTen, NgheNghiep) VALUES (?, ?, ?, ?)',
+            [TenDangNhap, MatKhau, HoTen, NgheNghiep]
+        );
         
-        const newUserId = insertResult.recordset[0].MaNguoiDung;
+        const newUserId = insertResult.insertId; 
 
         const queryDefaultCategories = `
             INSERT INTO DANHMUC (TenDanhMuc, LoaiGiaoDich, MaNguoiDung) VALUES 
-            (N'Ăn uống', 'Chi', @newId),
-            (N'Di chuyển', 'Chi', @newId),
-            (N'Tiền nhà', 'Chi', @newId),
-            (N'Mua sắm', 'Chi', @newId),
-            (N'Lương cứng', 'Thu', @newId),
-            (N'Thưởng', 'Thu', @newId),
-            (N'Khác', 'Thu', @newId)
+            ('Ăn uống', 'Chi', ?),
+            ('Di chuyển', 'Chi', ?),
+            ('Tiền nhà', 'Chi', ?),
+            ('Mua sắm', 'Chi', ?),
+            ('Lương cứng', 'Thu', ?),
+            ('Thưởng', 'Thu', ?),
+            ('Khác', 'Thu', ?)
         `;
 
-        await pool.request()
-            .input('newId', sql.Int, newUserId)
-            .query(queryDefaultCategories);
+        await pool.query(queryDefaultCategories, [
+            newUserId, newUserId, newUserId, newUserId, newUserId, newUserId, newUserId
+        ]);
 
         res.json({ success: true, message: 'Đăng ký thành công! Đã tạo sẵn danh mục cho bạn.' });
     } catch (err) {
@@ -376,7 +344,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// Cổng phát động cho môi trường Production
+// Cổng phát cho môi trường Production
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
     console.log(`Server Backend đang chạy tại port: ${PORT}`);
